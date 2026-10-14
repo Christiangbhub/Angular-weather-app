@@ -1,0 +1,35 @@
+<h1>Simple weather app</h1>
+
+<form [formGroup]="weatherForm" (ngSubmit)="onSubmit()">
+  <label for="city">Enter City name</label>
+  <!-- view -->
+  <input type="text" id="city" formControlName="city" />
+  <button [disabled]="!weatherForm.valid" type="submit">Submit</button>
+</form>
+
+<div class="weatherBox">
+  @switch (weatherAppState()) {
+    @case ('idle') {
+      <p>Hi there! Enter a city to display its weather forecast</p>
+    }
+    @case ('loading') {
+      <mat-spinner></mat-spinner>
+    }
+    @case ('error') {
+      <p>There was an error loading the forecast data</p>
+    }
+    @default {
+      <p>Weather app</p>
+    }
+  }
+  @if (weatherAppState() === 'success') {
+    <p>{{ weatherForm.valid }}</p>
+    @if (weatherForm.valid) {
+      <h2>Weather in {{ weatherForm.value.city }}</h2>
+      <p>{{ weatherAppState() }}</p>
+      <h3>{{ testWeatherData.temp }} °C</h3>
+      <p>{{ testWeatherData.weather_condition }}</p>
+      <img src="{{ testWeatherData.weather_icon }}" alt="weather_icon" />
+    }
+  }
+</div>
