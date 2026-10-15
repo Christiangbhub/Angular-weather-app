@@ -1,1 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+p,
+label {
+  font-size: 2em;
+}
+.error {
+  color: red;
+}
+
+.card {
+  background-color: lightblue;
+  width: 200px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+.card img {
+  max-width: 100%;
+}
+
+.card span {
+  text-decoration: underline;
+}
+
+.temp {
+  font-size: 5em;
+}

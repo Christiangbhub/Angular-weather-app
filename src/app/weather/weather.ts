@@ -1,13 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { WeatherData } from '../weather-data';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {
-  FormControl,
-  FormGroup,
-  Validators,
-  FormBuilder,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 @Component({
   imports: [MatProgressSpinnerModule, ReactiveFormsModule],
   selector: 'app-weather',
@@ -20,21 +14,37 @@ export class Weather {
     city: ['', Validators.required], //model
   });
 
+  cityName: string = '';
+
   weatherAppState = signal<'idle' | 'loading' | 'error' | 'success'>('idle');
 
   testWeatherData: WeatherData = {
     id: 1,
-    temp: 50,
+    temp: 1,
+    temp_feel: -3,
     weather_condition: 'cloudy',
     weather_icon: '/images/cloudy.png',
+    weather_icon_desc: 'Cloud icon',
   };
 
+  errorMsg = signal<'City not found' | ''>('');
+
   onSubmit() {
-    // event.preventDefault();
-    console.log(this.weatherForm.value);
+    const city = (this.weatherForm.value.city ?? '').trim();
+
+    if (city === '') {
+      return;
+    }
+    this.cityName = city;
+
     this.weatherAppState.set('loading');
     setTimeout(() => {
-      this.weatherAppState.set('success');
+      if (city.toLowerCase() === 'asdf') {
+        this.weatherAppState.set('error');
+        this.errorMsg.set('City not found');
+      } else {
+        this.weatherAppState.set('success');
+      }
     }, 3000);
   }
 }

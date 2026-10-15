@@ -1,10 +1,12 @@
 <h1>Simple weather app</h1>
 
 <form [formGroup]="weatherForm" (ngSubmit)="onSubmit()">
-  <label for="city">Enter City name</label>
+  <label for="city">Enter City name</label> <br />
   <!-- view -->
   <input type="text" id="city" formControlName="city" />
-  <button [disabled]="!weatherForm.valid" type="submit">Submit</button>
+  <button [disabled]="!weatherForm.valid || weatherAppState() === 'loading'" type="submit">
+    Submit
+  </button>
 </form>
 
 <div class="weatherBox">
@@ -17,19 +19,16 @@
     }
     @case ('error') {
       <p>There was an error loading the forecast data</p>
+      <p class="error">{{ errorMsg() }}</p>
     }
-    @default {
-      <p>Weather app</p>
-    }
-  }
-  @if (weatherAppState() === 'success') {
-    <p>{{ weatherForm.valid }}</p>
-    @if (weatherForm.valid) {
-      <h2>Weather in {{ weatherForm.value.city }}</h2>
-      <p>{{ weatherAppState() }}</p>
-      <h3>{{ testWeatherData.temp }} °C</h3>
-      <p>{{ testWeatherData.weather_condition }}</p>
-      <img src="{{ testWeatherData.weather_icon }}" alt="weather_icon" />
+    @case ('success') {
+      <div class="card">
+        <h2>Weather in {{ cityName }}</h2>
+        <h3 class="temp">{{ testWeatherData.temp }} °C</h3>
+        <p p>Feels like {{ testWeatherData.temp_feel }} °C</p>
+        <p>{{ testWeatherData.weather_condition }}</p>
+        <img [src]="testWeatherData.weather_icon" [alt]="testWeatherData.weather_icon_desc" />
+      </div>
     }
   }
 </div>
