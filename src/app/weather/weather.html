@@ -23,11 +23,11 @@
     }
     @case ('success') {
       <div class="card">
-        <h2>Weather in {{ cityName }}</h2>
-        <h3 class="temp">{{ testWeatherData.temp }} °C</h3>
+        <h2>{{ weatherApi.weatherObj.current.temperature_2m }} °C</h2>
+        <!-- <h3 class="temp">{{ testWeatherData.temp }} °C</h3>
         <p p>Feels like {{ testWeatherData.temp_feel }} °C</p>
         <p>{{ testWeatherData.weather_condition }}</p>
-        <img [src]="testWeatherData.weather_icon" [alt]="testWeatherData.weather_icon_desc" />
+        <img [src]="testWeatherData.weather_icon" [alt]="testWeatherData.weather_icon_desc" /> -->
       </div>
     }
   }

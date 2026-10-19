@@ -1,7 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
-import { WeatherData } from '../weather-data';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { Api } from '../api';
 @Component({
   imports: [MatProgressSpinnerModule, ReactiveFormsModule],
   selector: 'app-weather',
@@ -10,22 +10,15 @@ import { Validators, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 })
 export class Weather {
   private formBuilder = inject(FormBuilder);
+  weatherApi = inject(Api);
   weatherForm = this.formBuilder.group({
     city: ['', Validators.required], //model
   });
 
   cityName: string = '';
+  weather = JSON.stringify(this.weatherApi.weatherObj?.current);
 
   weatherAppState = signal<'idle' | 'loading' | 'error' | 'success'>('idle');
-
-  testWeatherData: WeatherData = {
-    id: 1,
-    temp: 1,
-    temp_feel: -3,
-    weather_condition: 'cloudy',
-    weather_icon: '/images/cloudy.png',
-    weather_icon_desc: 'Cloud icon',
-  };
 
   errorMsg = signal<'City not found' | ''>('');
 
@@ -43,6 +36,8 @@ export class Weather {
         this.weatherAppState.set('error');
         this.errorMsg.set('City not found');
       } else {
+        this.weatherApi.getGeolocation(city);
+        console.log(this.weatherApi?.weatherObj);
         this.weatherAppState.set('success');
       }
     }, 3000);
