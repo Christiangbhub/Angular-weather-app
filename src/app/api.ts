@@ -1,37 +1,54 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
+import { map, Observable, switchMap, throwError } from 'rxjs';
+
+interface GeoLocation {
+  lat: number;
+  lon: number;
+}
+
+interface WeatherResponse {
+  name: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+  };
+}
+
+export interface WeatherData {
+  city_name: string;
+  temperature: number;
+  feels_like: number;
+  humidity: number;
+}
 
 @Service()
 export class Api {
   private http = inject(HttpClient);
+  apiKey = '140a5ef731e08856b0a052cb5d752c2d'; //hide this apikey
 
-  latitude: any;
-  longitude: any;
-  weatherObj: any;
+  getGeoData(cityName: string): Observable<WeatherData> {
+    const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=${this.apiKey}`;
+    return this.http.get<GeoLocation[]>(geoUrl).pipe(
+      switchMap((locations) => {
+        if (locations.length === 0) {
+          return throwError(() => new Error('City not found'));
+        }
 
-  getGeolocation(city: string) {
-    this.http
-      .get<any>(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`,
-      )
-      .subscribe({
-        next: (data) => {
-          this.latitude = data.results[0].latitude;
-          this.longitude = data.results[0].longitude;
-          this.getWeatherForecast(this.latitude, this.longitude);
-        },
-        error: (error) => console.log(error),
-      });
-  }
+        const { lat, lon } = locations[0];
 
-  getWeatherForecast(latitude: number, longitude: number) {
-    this.http
-      .get<any>(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m&current=temperature_2m`,
-      )
-      .subscribe({
-        next: (data) => (this.weatherObj = data),
-        error: (error) => console.log(error),
-      });
+        const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}`;
+
+        return this.http.get<WeatherResponse>(weatherUrl).pipe(
+          map((data): WeatherData => ({
+            city_name: data.name,
+            temperature: data.main.temp,
+            feels_like: data.main.feels_like,
+            humidity: data.main.humidity,
+          })),
+        );
+      }),
+    );
   }
 }

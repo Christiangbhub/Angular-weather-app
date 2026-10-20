@@ -1,10 +1,16 @@
 <h1>Simple weather app</h1>
 
-<form [formGroup]="weatherForm" (ngSubmit)="onSubmit()">
-  <label for="city">Enter City name</label> <br />
-  <!-- view -->
-  <input type="text" id="city" formControlName="city" />
-  <button [disabled]="!weatherForm.valid || weatherAppState() === 'loading'" type="submit">
+<form [formGroup]="weatherForm" (ngSubmit)="onSubmit()" class="flex">
+  <mat-form-field>
+    <mat-label>Enter City name</mat-label>
+    <input type="text" id="city" formControlName="city" matInput />
+  </mat-form-field>
+
+  <button
+    [disabled]="!weatherForm.valid || weatherAppState() === 'loading'"
+    type="submit"
+    matButton="elevated"
+  >
     Submit
   </button>
 </form>
@@ -22,13 +28,21 @@
       <p class="error">{{ errorMsg() }}</p>
     }
     @case ('success') {
-      <div class="card">
-        <h2>{{ weatherApi.weatherObj.current.temperature_2m }} °C</h2>
-        <!-- <h3 class="temp">{{ testWeatherData.temp }} °C</h3>
-        <p p>Feels like {{ testWeatherData.temp_feel }} °C</p>
-        <p>{{ testWeatherData.weather_condition }}</p>
-        <img [src]="testWeatherData.weather_icon" [alt]="testWeatherData.weather_icon_desc" /> -->
-      </div>
+      <p>Success</p>
+
+      <h2>{{ weatherData.city_name }}</h2>
+
+      <p>
+        Temperature:
+        {{ kelvintoCelsius(weatherData.temperature) }} °C
+      </p>
+
+      <p>
+        Feels like:
+        {{ kelvintoCelsius(weatherData.feels_like) }} °C
+      </p>
+
+      <p>Humidity: {{ weatherData.humidity }}</p>
     }
   }
 </div>
