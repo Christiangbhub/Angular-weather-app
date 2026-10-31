@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { map, Observable, switchMap, throwError } from 'rxjs';
+import { map, Observable, switchMap, throwError, forkJoin } from 'rxjs';
 
-interface GeoLocation {
+export interface GeoLocation {
   lat: number;
   lon: number;
 }
@@ -13,22 +13,97 @@ interface WeatherResponse {
     temp: number;
     feels_like: number;
     humidity: number;
+    temp_min: number;
+    temp_max: number;
   };
+  wind: {
+    speed: number;
+  };
+  weather: [
+    {
+      main: string;
+      description: string;
+      icon: string;
+    },
+  ];
+}
+
+interface HourlyResponse {
+  list:
+    | [
+        {
+          dt: number;
+          dt_txt: string;
+          main: {
+            temp: number;
+            feels_like: number;
+            humidity: number;
+            temp_min: number;
+            temp_max: number;
+          };
+          wind: {
+            speed: number;
+          };
+          weather: [
+            {
+              main: string;
+              description: string;
+              icon: string;
+            },
+          ];
+        },
+      ]
+    | null;
 }
 
 export interface WeatherData {
-  city_name: string;
-  temperature: number;
-  feels_like: number;
-  humidity: number;
+  city_name: string | null;
+  temperature: number | null;
+  temp_min: number;
+  temp_max: number;
+  feels_like: number | null;
+  humidity: number | null;
+  wind_speed: number;
+  weatherStatus: string;
+  weatherDescription: string;
+  weatherIconCode: string;
 }
 
+export interface HourlyWeatherData {
+  list:
+    | [
+        {
+          dt: number;
+          dt_txt: string;
+          main: {
+            temp: number;
+            feels_like: number;
+            humidity: number;
+            temp_min: number;
+            temp_max: number;
+          };
+          wind: {
+            speed: number;
+          };
+          weather: [
+            {
+              main: string;
+              description: string;
+              icon: string;
+            },
+          ];
+        },
+      ]
+    | null;
+}
 @Service()
 export class Api {
   private http = inject(HttpClient);
   apiKey = '140a5ef731e08856b0a052cb5d752c2d'; //hide this apikey
 
-  getGeoData(cityName: string): Observable<WeatherData> {
+  hourlyWeather: HourlyWeatherData[] = [];
+
+  getCurrrentWeatherData(cityName: string): Observable<WeatherData> {
     const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=${this.apiKey}`;
     return this.http.get<GeoLocation[]>(geoUrl).pipe(
       switchMap((locations) => {
@@ -46,9 +121,50 @@ export class Api {
             temperature: data.main.temp,
             feels_like: data.main.feels_like,
             humidity: data.main.humidity,
+            wind_speed: data.wind.speed,
+            temp_max: data.main.temp_max,
+            temp_min: data.main.temp_min,
+            weatherStatus: data.weather[0].main,
+            weatherDescription: data.weather[0].description,
+            weatherIconCode: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
           })),
         );
       }),
     );
+  }
+
+  // continue here
+
+  getGeolocation(cityName: string) {
+    const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=5&appid=${this.apiKey}`;
+    console.log(cityName);
+    return this.http.get<any>(geoUrl).pipe(
+      map((data) => ({
+        lat: data[0].lat,
+        lon: data[0].lon,
+      })),
+    );
+  }
+
+  getHourlyWeatherData(lat: number, lon: number) {
+    let params = new HttpParams();
+    params.appendAll({
+      lat: lat,
+      lon: lon,
+      cnt: 5,
+      appid: this.apiKey,
+    });
+    const hourlyWeatherUrl = `http://api.openweathermap.org/data/2.5/forecast?`;
+
+    return this.http
+      .get<any>(hourlyWeatherUrl, {
+        params: { lat: lat, lon: lon, cnt: 5, appid: this.apiKey },
+      })
+      .pipe(
+        map((data): HourlyResponse => ({
+          // hour: list;
+          list: data.list,
+        })),
+      );
   }
 }

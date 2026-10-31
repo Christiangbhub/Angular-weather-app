@@ -1,36 +1,91 @@
 /* You can add global styles to this file, and also import other style files */
 p,
 label {
-  font-size: 2em;
+  font-size: 1em;
+  margin: 0;
 }
+
 .error {
   color: red;
 }
 
 .card {
   background-color: lightblue;
-  max-width: 500px;
   padding: 10px;
-  margin: 10px;
   border-radius: 10px;
 }
 
 .card img {
-  max-width: 100%;
-}
-
-.card span {
-  text-decoration: underline;
+  max-width: 100px;
 }
 
 .temp {
-  font-size: 5em;
+  font-size: 3.5em;
   font-weight: bold;
 }
 
-.flex {
-  max-width: 300px;
+.mat-mdc-card {
+  height: 100%;
   display: flex;
-  flex-direction: column;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.weatherBox {
+  grid-column: 2 / 2;
+}
+.hourlyWeather {
+  height: 100%;
+  grid-column-start: 1;
+  /* grid-row: 2/ 3; */
+  grid-column: span 2;
+}
+.hourlyWeatherBox {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
   align-items: center;
+  gap: 10px;
+}
+
+.hourlyWeatherBox .entries {
+  border: 1px solid lightblue;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.mat-mdc-form-field {
+  display: flex;
+  width: 100%;
+}
+
+.small {
+  padding: 20px;
+  max-width: 30%;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.flex-btn {
+  display: flex;
+  gap: 10px;
+}
+
+.low {
+  opacity: 0.6;
+}
+
+.flex-small {
+  border: none;
+  display: flex;
+  gap: 10px;
 }
