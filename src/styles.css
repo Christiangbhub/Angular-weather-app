@@ -32,7 +32,9 @@ label {
 .container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 15px;
+  /* height: 100vh; */
+  padding: 20px;
 }
 
 .weatherBox {

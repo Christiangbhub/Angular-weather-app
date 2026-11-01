@@ -49,6 +49,7 @@ export class Weather {
     weatherStatus: '',
     weatherDescription: '',
     weatherIconCode: '',
+    time: 0,
   };
   geoLocation: GeoLocation = {
     lat: 0,
@@ -90,7 +91,6 @@ export class Weather {
 
         this.weatherApi.getHourlyWeatherData(this.geoLocation.lat, this.geoLocation.lon).subscribe({
           next: (data) => {
-            console.log(data.list);
             this.hourlyWeatherData.list = data.list;
             this.hourlyDataState.set(false);
           },
@@ -101,8 +101,8 @@ export class Weather {
     console.log(this.hourlyWeatherData);
   }
 
-  getTime(date: string) {
-    const time = new Date(date);
+  getTime(timeInput: number) {
+    const time = new Date(timeInput * 1000);
 
     const timeString = time.toLocaleTimeString('en-US', {
       hour12: true,
@@ -138,6 +138,7 @@ export class Weather {
         this.weatherData.weatherStatus = data.weatherStatus;
         this.weatherData.weatherDescription = data.weatherDescription;
         this.weatherData.weatherIconCode = data.weatherIconCode;
+        this.weatherData.time = data.time;
 
         this.weatherAppState.set('success');
         this.currentDataState.set(false);

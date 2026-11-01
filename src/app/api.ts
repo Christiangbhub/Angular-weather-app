@@ -9,6 +9,7 @@ export interface GeoLocation {
 
 interface WeatherResponse {
   name: string;
+  dt: number;
   main: {
     temp: number;
     feels_like: number;
@@ -67,6 +68,7 @@ export interface WeatherData {
   weatherStatus: string;
   weatherDescription: string;
   weatherIconCode: string;
+  time: number;
 }
 
 export interface HourlyWeatherData {
@@ -127,6 +129,7 @@ export class Api {
             weatherStatus: data.weather[0].main,
             weatherDescription: data.weather[0].description,
             weatherIconCode: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+            time: data.dt,
           })),
         );
       }),

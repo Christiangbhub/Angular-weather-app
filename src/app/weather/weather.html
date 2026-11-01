@@ -43,6 +43,7 @@
         }
         @case ('success') {
           <h2>{{ weatherData?.city_name }}</h2>
+          <p>{{ getTime(weatherData.time) }}</p>
           <img [src]="weatherData.weatherIconCode" alt="current weather icon" />
           <h2 class="temp">
             {{ kelvintoCelsius(weatherData?.temperature) }}
