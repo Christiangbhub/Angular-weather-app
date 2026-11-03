@@ -10,6 +10,7 @@ export interface GeoLocation {
 interface WeatherResponse {
   name: string;
   dt: number;
+  timezone: number;
   main: {
     temp: number;
     feels_like: number;
@@ -29,34 +30,6 @@ interface WeatherResponse {
   ];
 }
 
-interface HourlyResponse {
-  list:
-    | [
-        {
-          dt: number;
-          dt_txt: string;
-          main: {
-            temp: number;
-            feels_like: number;
-            humidity: number;
-            temp_min: number;
-            temp_max: number;
-          };
-          wind: {
-            speed: number;
-          };
-          weather: [
-            {
-              main: string;
-              description: string;
-              icon: string;
-            },
-          ];
-        },
-      ]
-    | null;
-}
-
 export interface WeatherData {
   city_name: string | null;
   temperature: number | null;
@@ -68,15 +41,18 @@ export interface WeatherData {
   weatherStatus: string;
   weatherDescription: string;
   weatherIconCode: string;
-  time: number;
+  timezone: number;
+  dt: number;
 }
 
 export interface HourlyWeatherData {
+  timezone: number;
   list:
     | [
         {
           dt: number;
           dt_txt: string;
+
           main: {
             temp: number;
             feels_like: number;
@@ -129,7 +105,8 @@ export class Api {
             weatherStatus: data.weather[0].main,
             weatherDescription: data.weather[0].description,
             weatherIconCode: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
-            time: data.dt,
+            dt: data.dt,
+            timezone: data.timezone,
           })),
         );
       }),
@@ -150,23 +127,17 @@ export class Api {
   }
 
   getHourlyWeatherData(lat: number, lon: number) {
-    let params = new HttpParams();
-    params.appendAll({
-      lat: lat,
-      lon: lon,
-      cnt: 5,
-      appid: this.apiKey,
-    });
     const hourlyWeatherUrl = `http://api.openweathermap.org/data/2.5/forecast?`;
 
     return this.http
       .get<any>(hourlyWeatherUrl, {
-        params: { lat: lat, lon: lon, cnt: 5, appid: this.apiKey },
+        params: { lat: lat, lon: lon, cnt: '5', appid: this.apiKey },
       })
       .pipe(
-        map((data): HourlyResponse => ({
+        map((data): HourlyWeatherData => ({
           // hour: list;
           list: data.list,
+          timezone: data.city.timezone,
         })),
       );
   }

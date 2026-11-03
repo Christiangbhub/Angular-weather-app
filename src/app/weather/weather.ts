@@ -35,6 +35,7 @@ export class Weather {
   cityName: string = '';
 
   hourlyWeatherData: HourlyWeatherData = {
+    timezone: 0,
     list: null,
   };
 
@@ -49,7 +50,8 @@ export class Weather {
     weatherStatus: '',
     weatherDescription: '',
     weatherIconCode: '',
-    time: 0,
+    dt: 0,
+    timezone: 0,
   };
   geoLocation: GeoLocation = {
     lat: 0,
@@ -92,6 +94,8 @@ export class Weather {
         this.weatherApi.getHourlyWeatherData(this.geoLocation.lat, this.geoLocation.lon).subscribe({
           next: (data) => {
             this.hourlyWeatherData.list = data.list;
+            this.hourlyWeatherData.timezone = data.timezone;
+            console.log(data);
             this.hourlyDataState.set(false);
           },
         });
@@ -101,8 +105,8 @@ export class Weather {
     console.log(this.hourlyWeatherData);
   }
 
-  getTime(timeInput: number) {
-    const time = new Date(timeInput * 1000);
+  getTime(timeInput: number, timezoneOffset: number) {
+    const time = new Date((timeInput + timezoneOffset) * 1000);
 
     const timeString = time.toLocaleTimeString('en-US', {
       hour12: true,
@@ -114,12 +118,35 @@ export class Weather {
     return timeString;
   }
 
-  getDate(date: string) {
-    const newDate = new Date(date);
-
-    const datetring = newDate.toLocaleDateString('en-US', {
+  getTimeWithNoOffset(timeInput: string) {
+    const timeString = new Date(timeInput).toLocaleTimeString('en-US', {
+      hour12: true,
       timeZone: 'UTC',
-      weekday: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+
+    return timeString;
+  }
+
+  getDate(timestamp: string) {
+    const datetring = new Date(timestamp).toLocaleDateString('en-US', {
+      timeZone: 'UTC',
+      month: 'long',
+      weekday: 'long',
+      day: 'numeric',
+    });
+
+    return datetring;
+  }
+
+  getDateWithOffset(timeInput: number, timezoneOffset: number) {
+    const date = new Date((timeInput + timezoneOffset) * 1000);
+    const datetring = date.toLocaleDateString('en-US', {
+      timeZone: 'UTC',
+      month: 'long',
+      weekday: 'long',
+      day: 'numeric',
     });
 
     return datetring;
@@ -138,7 +165,8 @@ export class Weather {
         this.weatherData.weatherStatus = data.weatherStatus;
         this.weatherData.weatherDescription = data.weatherDescription;
         this.weatherData.weatherIconCode = data.weatherIconCode;
-        this.weatherData.time = data.time;
+        this.weatherData.dt = data.dt;
+        this.weatherData.timezone = data.timezone;
 
         this.weatherAppState.set('success');
         this.currentDataState.set(false);

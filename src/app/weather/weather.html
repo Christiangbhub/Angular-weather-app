@@ -43,7 +43,8 @@
         }
         @case ('success') {
           <h2>{{ weatherData?.city_name }}</h2>
-          <p>{{ getTime(weatherData.time) }}</p>
+          <p>{{ getDateWithOffset(weatherData.dt, weatherData.timezone) }}</p>
+          <p>{{ getTime(weatherData.dt, weatherData.timezone) }}</p>
           <img [src]="weatherData.weatherIconCode" alt="current weather icon" />
           <h2 class="temp">
             {{ kelvintoCelsius(weatherData?.temperature) }}
@@ -71,7 +72,8 @@
         @for (items of hourlyWeatherData.list; track items.dt) {
           <div class="entries">
             @if (hourlyWeatherData.list != null) {
-              <p>{{ getDate(items.dt_txt) }} {{ getTime(items.dt_txt) }}</p>
+              <p>{{ getDate(items.dt_txt) }}</p>
+              <p>{{ getTime(items.dt, hourlyWeatherData.timezone) }}</p>
               <h2 class="temp">{{ kelvintoCelsius(items.main.temp) }}</h2>
               <img [src]="weatherData.weatherIconCode" alt="current weather icon" />
 
